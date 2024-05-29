@@ -1,0 +1,267 @@
+import javahttps://www.onlinegdb.com/online_java_compiler#_editor_8595238001.util.*;
+
+/**
+ * A class that represents a signed 10-bit binary number represented using a
+ * twos complement representation.
+ *
+ */
+public class Declet implements Comparable<Declet> {
+
+    public static final int MAX_VALUE = 511;
+    public static final int MIN_VALUE = -512;
+    public static final int NUM_BITS = 10;
+
+    List<Integer> Declets = new ArrayList<>(10);
+
+    /**
+     * this method returns the bits of this Declet as a list
+     * @return: the bits of this number as a list
+     */
+    public List<Bit> getBits() {
+        List<Bit> Bits = new ArrayList<>(10);
+        for (int i : Declets) {
+            if (i == 1) {
+                Bits.add(Bit.ONE);
+            } else if (i == 0) {
+                Bits.add(Bit.ZERO);
+            }
+        }
+        return Bits;
+    }
+    /**
+     *this method initialize this Declet to have value zero
+     */
+    public Declet() {
+        for (int i = 0; i < NUM_BITS; i++) {
+            Declets.add(0);
+        }
+    }
+    /**
+     * this method initialize this Declet to have specified bits
+     * @param: an array of 10 bits / a comma separated list of 10 bits
+     * this method throws IllegalArgumentException - if decimal is outside the range that a Declet can represent
+     */
+    public Declet(Bit... theBits) throws IllegalArgumentException {
+        if (theBits.length != NUM_BITS) {
+            throw new IllegalArgumentException("this declet is outside the range that a Declet can represent");
+        }
+        for (Bit i : theBits) {
+            if (i == Bit.ONE) {
+                Declets.add(1);
+            } else if (i == Bit.ZERO) {
+                Declets.add(0);
+            }
+        }
+    }
+    /**
+     * this method returns the decimal (base 10) value of this Declet as an int.
+     * @return: the decimal (base 10) value of this binary number
+     */
+    public int toDecimal() {
+        int sum = -(int) Math.pow(2, 9);
+        sum = sum * Declets.get(0);
+        for (int i = 1; i < 10; i++) {
+            int sum2 = (int) Math.pow(2, 9-i) * Declets.get(i);
+            sum += sum2;
+        }
+        return sum;
+    }
+    @Override
+    public String toString(){
+        StringBuilder new2 = new StringBuilder();
+        for (int i : Declets) {
+            if (i == 1) {
+                new2.append(Bit.ONE);
+            } else if (i == 0) {
+                new2.append(Bit.ZERO);
+            }
+        }
+        String singleString = new2.toString();
+        return singleString;
+    }
+    /**
+     * this method returns true if this Declet is negative, and false otherwise.
+     * @return: true if this Declet is negative, and false otherwise
+     */
+    public boolean isNegative() {
+        int sum = toDecimal();
+        if (sum < 0) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * this method initializes this Declet to the specified base-10 value.
+     * @param: decimal - a base-10 value
+     */
+    public Declet(int decimal) {
+        if (decimal > MAX_VALUE || decimal < MIN_VALUE)
+            throw new IllegalArgumentException("this method can not have integer as parameter out of the range");
+        if (decimal < 0) {
+            Declets.add(1);
+            decimal += 512;
+        }
+        else if(decimal >= 0){
+               Declets.add(0);
+        }
+        for (int i = 8; i >= 0; i--) {
+            int k = (int) Math.pow(2, i);
+            int j = decimal / k;
+            if (j == 1) {
+                Declets.add(1);
+                decimal -= k;
+               }
+            else if (j == 0) {
+                Declets.add(0);
+               }
+           }
+       }
+    /**
+     * this method add one to the value of this Declet changing the value of this Declet.
+     * Overflow occurs if the value of this Declet is equal to Declet.MAX_VALUE.
+     */
+    public void addOne() {
+        Bit carry = Bit.ONE;
+        int[] added = new int[NUM_BITS];
+        for (int i=(NUM_BITS-1);i>=0;i--){
+            if( Declets.get(i) == 1 && carry ==Bit.ONE){
+                added[i] = 0;
+            }
+            else{
+                added[i] = Declets.get(i)+ carry.value();
+                carry = Bit.ZERO;
+            }
+        }
+        for (int i=0;i<NUM_BITS;i++) {
+            if (added[i] == 0) {
+                Declets.set(i,0);
+            } else {
+                Declets.set(i,1);
+            }
+            }
+    }
+    /**
+     *this method Adds the value of other to the value of this Declet changing the value of this Declet.
+     * Overflow occurs if the sum is greater than Declet.MAX_VALUE or less than Declet.MIN_VALUE.
+     */
+    public void add(Declet other) {
+        /**
+         *this method Adds the value of other to the value of this Declet changing the value of this Declet.
+         * Overflow occurs if the sum is greater than Declet.MAX_VALUE or less than Declet.MIN_VALUE.
+         */
+         Bit carry = Bit.ZERO;
+         int[] added = new int[NUM_BITS];
+
+         for (int i=(NUM_BITS-1);i>=0;i--) {
+             int sum = Declets.get(i)+other.Declets.get(i)+ carry.value();
+             if (sum ==2) {
+                 added[i] = 0;
+                 carry = Bit.ONE;
+             }
+             else if(sum ==3){
+                 added[i] = 1;
+                 carry = Bit.ONE;
+             }
+             else if(sum ==1){
+                 added[i] = 0;
+                 carry = Bit.ONE;
+             }
+             else if(sum ==0){
+                 added[i] = 0;
+                 carry = Bit.ZERO;
+             }
+         for (int j=0;i<NUM_BITS;i++) {
+             if (added[j] == 0) {
+                 Declets.set(j,0);
+                 }
+             else {
+                     Declets.set(j,1);
+                 }
+             }
+         }
+    }
+
+    /**
+     * converts two Declet's sum and compare them
+     * @param other the object to be compared.
+     * @return integer
+     */
+    @Override
+    public int compareTo(Declet other){
+        return Integer.compare(this.toDecimal(), other.toDecimal());
+    }
+
+    /***
+     * this method compares this Declet to an object for equality.
+     * @param obj
+     * @return true if the two are equal to each other, otherwise return false
+     */
+    @Override
+    public boolean equals(Object obj){
+        if(this == obj){
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Declet other = (Declet) obj;
+        if ((this.Declets)!=(other.Declets)){
+            return false;
+        }
+        return true;
+    }
+    /**
+     * this method returns a hash code for this Declet.
+     */
+    @Override
+    public int hashCode(){
+        return Objects.hash(this.Declets);
+    }
+
+    /**
+     * this method flips the bits of this Declet.
+     */
+    public void not(){
+        for (int i=(NUM_BITS-1);i>=0;i--){
+            if( Declets.get(i) == 1){
+                Declets.set(i,0);
+            }
+            else Declets.set(i, 1);
+        }
+    }
+       /**
+        * Prints some sums illustrating overflow at {@code Decle.MAX_VALUE} and
+        * {@code Decle.MIN_VALUE}.
+        *
+        * @param args not used
+        */
+    public static void main(String[] args) {
+        Declet d = new Declet(Declet.MAX_VALUE - 2);
+        Declet one = new Declet(1);
+
+        System.out.println("Overflow at Declet.MAX_VALUE");
+        for (int i = 0; i <= 4; i++) {
+            System.out.println("d       " + d + " = " + d.toDecimal());
+            System.out.println("      + " + one);
+            d.addOne();
+            System.out.println("d + 1 = " + d + " = " + d.toDecimal());
+            System.out.println();
+           }
+
+        Declet negOne = new Declet(-1);
+
+        System.out.println("Overflow at Declet.MIN_VALUE");
+        for (int i = 0; i <= 4; i++) {
+             System.out.println("d     = " + d + " = " + d.toDecimal());
+             System.out.println("      + " + negOne);
+             d.add(negOne);
+             System.out.println("d - 1 = " + d + " = " + d.toDecimal());
+             System.out.println();
+           }
+       }
+
+
+   }
